@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BatchBinder - Bookshelf</title>
+    <link href="https://fonts.googleapis.com/css?family=Raleway:400,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:400,600&display=swap" rel="stylesheet">
+    <style>
+        /* ...existing code from index.html... */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Raleway', 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            background-color: #fff;
+            color: #111;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px 0 20px;
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 32px;
+            color: #38bdf8;
+            text-align: center;
+        }
+        .bookshelf-empty {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.1rem;
+        }
+        .bookmarked-subject {
+            background: #fff;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(56,189,248,0.07);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.08rem;
+            border: 1px solid #e0e0e0;
+            transition: box-shadow 0.2s;
+        }
+        .bookmarked-subject:hover {
+            box-shadow: 0 4px 16px rgba(56,189,248,0.13);
+        }
+        .remove-bookmark {
+            color: #ef4444;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            font-size: 1.2rem;
+        }
+        .remove-bookmark:hover {
+            background: #fee2e2;
+            transform: scale(1.1);
+        }
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #4b6cb7;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 1rem;
+            box-shadow: 0 2px 8px rgba(56,189,248,0.13);
+        }
+        /* ...dark mode styles from index.html... */
+        body.dark-mode {
+            background-color: #000 !important;
+            color: linen !important;
+        }
+        body.dark-mode .container {
+            background: transparent;
+        }
+        body.dark-mode .bookmarked-subject {
+            background: #111 !important;
+            color: linen !important;
+            border-color: #222;
+        }
+        body.dark-mode .bookshelf-empty {
+            color: #eee;
+        }
+        body.dark-mode .remove-bookmark {
+            color: #f87171;
+        }
+        body.dark-mode .remove-bookmark:hover {
+            background: #7f1d1d;
+        }
+        body.dark-mode .toast {
+            background: #2563eb;
+            color: #fff;
+        }
+        body.dark-mode .navbar {
+            background-color: #000 !important;
+            border-color: #222 !important;
+        }
+        body.dark-mode .navbar-logo,
+        body.dark-mode .navbar-links a {
+            color: linen !important;
+        }
+        body.dark-mode .navbar-search input {
+            background-color: #111 !important;
+            color: linen !important;
+            border-color: #222;
+        }
+        .navbar {
+            transition: all 0.3s ease;
+            background-color: #fff;
+        }
+        .navbar-logo,
+        .navbar-links a,
+        .navbar-search input {
+            transition: all 0.3s ease;
+        }
+        /* Navbar styles from index.html */
+        .navbar {
+            width: 100%;
+            background: #fff;
+            color: #111;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            height: 64px;
+            position: relative;
+            z-index: 10;
+            border-bottom: 1px solid #e5e7eb;
+            transition: background 0.3s, color 0.3s;
+        }
+        .navbar-logo {
+            font-size: 1.7rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: #111;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: transform 0.25s cubic-bezier(.4,2,.6,1), box-shadow 0.25s;
+        }
+        .navbar-logo:hover {
+            color: #38bdf8;
+            transform: scale(1.08) rotate(-2deg);
+            text-shadow: 0 4px 18px rgba(56,189,248,0.18);
+            box-shadow: 0 2px 16px rgba(56,189,248,0.10);
+        }
+        .navbar-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+        .navbar-links a {
+            color: #111;
+            text-decoration: none;
+            font-size: 0.89rem;
+            font-weight: 500;
+            transition: color 0.2s;
+            padding: 2px 8px;
+            font-family: 'Poppins', 'Raleway', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+        }
+        .navbar-links a:hover {
+            color: #38bdf8;
+        }
+        .navbar-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: currentColor;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        .navbar-links a:hover::after {
+            transform: scaleX(1);
+        }
+        .navbar-links a.active,
+        .navbar-links a[href="bookshelf.html"] {
+            color: #38bdf8;
+        }
+        .navbar-links a:nth-child(1):hover { color: orangered !important; }
+        .navbar-links a:nth-child(2):hover { color: #2563eb !important; }
+        .navbar-links a:nth-child(3):hover { color: #10b981 !important; }
+        .navbar-links a:nth-child(4):hover { color: #facc15 !important; }
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+        .navbar-search {
+            position: relative;
+        }
+        .navbar-search input[type="text"] {
+            padding: 7px 36px 7px 14px;
+            border-radius: 18px;
+            border: 1px solid #e0e0e0;
+            font-size: 1rem;
+            width: 160px;
+            outline: none;
+            background: #fff;
+            color: #111;
+        }
+        .navbar-search button {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+        }
+        .navbar-search button:hover {
+            transform: translateY(-50%) scale(1.1);
+            opacity: 0.8;
+        }
+        .navbar-btn {
+            background: #38bdf8;
+            color: #fff;
+            border: none;
+            border-radius: 18px;
+            padding: 7px 20px;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-left: 6px;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
+            text-decoration: none !important;
+            box-shadow: 0 2px 8px rgba(56,189,248,0.08);
+            outline: none;
+            display: inline-block;
+        }
+        .navbar-btn:hover {
+            background: #0ea5e9;
+            color: #fff;
+            transform: translateY(-2px) scale(1.04);
+            box-shadow: 0 4px 16px rgba(56,189,248,0.18);
+        }
+        .theme-toggle-btn {
+            background: #e5e7eb;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            width: 62px;
+            height: 32px;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            padding: 4px;
+        }
+        #themeIcon {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transform: translateX(0);
+            transition: transform 0.3s ease, background-color 0.3s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .theme-toggle-btn.dark {
+            background: #1e293b;
+        }
+        .theme-toggle-btn.dark #themeIcon {
+            transform: translateX(30px);
+            background: #0ea5e9;
+        }
+        @media (max-width: 900px) {
+            .navbar, .navbar-container {
+                flex-direction: column;
+                align-items: flex-start;
+                height: auto;
+                padding: 12px 10px;
+            }
+            .navbar-links {
+                gap: 18px;
+            }
+            .navbar-actions {
+                gap: 10px;
+            }
+        }
+        /* ...existing code... */
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="#" class="navbar-logo">BatchBinder</a>
+        <div class="navbar-links">
+            <a href="index2.html">Home</a>
+            <a href="notes.html">Notes</a>
+            <a href="bookshelf.html" class="active">BookShelf</a>
+            <a href="#" onclick="showComingSoonMessage('Collaborative Community'); return false;">Community</a>
+        </div>
+        <div class="navbar-actions">
+            <form class="navbar-search" onsubmit="return false;">
+                <input type="text" placeholder="Search...">
+                <button type="submit">&#128269;</button>
+            </form>
+            <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle theme">
+                <span id="themeIcon">🌙</span>
+            </button>
+            <a href="#" class="navbar-btn">Sign Up</a>
+            <a href="#" class="navbar-btn">Login</a>
+        </div>
+    </nav>
+    <div class="container">
+        <h1>My Bookshelf</h1>
+        <div id="bookmarked-subjects">
+            <!-- Bookmarked subjects will be loaded here -->
+        </div>
+    </div>
+    <script>
+        function showComingSoonMessage(feature) {
+            const messages = [
+                `🚧 Oops! ${feature} is still cooking in our development kitchen! 👨‍🍳`,
+                `✨ Hold tight! ${feature} is getting dressed up for its big debut! 🎭`,
+                `🎯 Almost there! ${feature} is doing final rehearsals! 🎬`,
+                `🔮 ${feature} is learning some cool tricks before meeting you! 🎩`,
+                `🚀 ${feature} is in its final countdown to launch! 🌟`
+            ];
+            alert(messages[Math.floor(Math.random() * messages.length)]);
+        }
+        // Theme toggle logic (same as index.html)
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        function setTheme(dark) {
+            if (dark) {
+                document.body.classList.add('dark-mode');
+                themeToggle.classList.add('dark');
+                themeIcon.textContent = '☀️';
+            } else {
+                document.body.classList.remove('dark-mode');
+                themeToggle.classList.remove('dark');
+                themeIcon.textContent = '🌙';
+            }
+        }
+        setTheme(prefersDark);
+        themeToggle.onclick = function() {
+            themeIcon.classList.add('theme-animate');
+            setTimeout(() => themeIcon.classList.remove('theme-animate'), 500);
+            const isDark = document.body.classList.toggle('dark-mode');
+            setTheme(isDark);
+        };
+
+        function loadBookmarks() {
+            const container = document.getElementById('bookmarked-subjects');
+            const bookmarks = JSON.parse(localStorage.getItem('bookmarkedSubjects')) || [];
+            if (bookmarks.length === 0) {
+                container.innerHTML = '<div class="bookshelf-empty">No bookmarked subjects yet!</div>';
+                return;
+            }
+            container.innerHTML = bookmarks.map(subject => `
+                <div class="bookmarked-subject">
+                    <span>${subject}</span>
+                    <span class="remove-bookmark" onclick="removeBookmark('${subject}')">🗑️</span>
+                </div>
+            `).join('');
+        }
+        function removeBookmark(subject) {
+            let bookmarks = JSON.parse(localStorage.getItem('bookmarkedSubjects')) || [];
+            bookmarks = bookmarks.filter(b => b !== subject);
+            localStorage.setItem('bookmarkedSubjects', JSON.stringify(bookmarks));
+            loadBookmarks();
+            showToast(`${subject} removed from Bookshelf!`);
+        }
+        function showToast(message) {
+            let toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.style.opacity = '1', 100);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 2200);
+        }
+        document.addEventListener('DOMContentLoaded', loadBookmarks);
+    </script>
+</body>
+</html>

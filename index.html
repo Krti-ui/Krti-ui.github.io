@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<!-- filepath: c:\Users\DELL\OneDrive\Desktop\BatchBinder\open.html -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to BatchBinder</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Raleway:400,700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            margin: 0;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Raleway', Arial, sans-serif;
+            overflow: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        body.dark-mode {
+            background: #111;
+            color: linen;
+        }
+
+        .logo-container {
+            position: fixed;
+            top: 40px; /* Increased distance from top */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            text-align: center;
+        }
+
+        .batchbinder-logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #38bdf8;
+            display: inline-block;
+            text-shadow: 2px 2px 4px rgba(56,189,248,0.5);
+            transition: transform 0.3s cubic-bezier(.4,2,.6,1);
+        }
+
+        .logo-tagline {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            left: 0;
+            top: 100%;
+            font-size: 0.9rem;
+            color: #666;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .logo-tagline {
+            color: #aaa;
+        }
+
+        .logo-container:hover .batchbinder-logo {
+            transform: translateY(-5px);
+        }
+
+        .logo-container:hover .logo-tagline {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .theme-toggle-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #e5e7eb;
+            border: none;
+            cursor: pointer;
+            width: 62px;
+            height: 32px;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            padding: 4px;
+            z-index: 10;
+        }
+
+        #themeIcon {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transform: translateX(0);
+            transition: transform 0.3s ease, background-color 0.3s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .theme-toggle-btn.dark {
+            background: #1e293b;
+        }
+
+        .theme-toggle-btn.dark #themeIcon {
+            transform: translateX(30px);
+            background: #0ea5e9;
+        }
+
+        .particles-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            perspective: 1000px;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0;
+            animation: particleFloat 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateZ(0) rotate(0deg);
+                opacity: 0;
+            }
+            20% { opacity: 1; }
+            90% { opacity: 1; }
+            100% {
+                transform: translateY(-20vh) translateZ(100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .center-box {
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(56,189,248,0.13);
+            padding: 48px 32px 32px 32px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            border: none;
+            position: relative;
+            z-index: 1;
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .fun-fact-badge {
+            position: relative;
+            display: block;
+            font-size: 0.95rem;
+            color: #222;
+            background: #ffeb3b;
+            padding: 4px 18px;
+            border-radius: 8px;
+            margin-bottom: 28px;
+            margin-top: 0;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(212,175,55,0.13);
+            left: 0;
+            right: 0;
+            text-align: center;
+        }
+
+        body.dark-mode .fun-fact-badge {
+            color: #222;
+            background: #ffe066;
+        }
+
+        body.dark-mode .center-box {
+            background: #1a1a1a;
+            color: linen;
+            box-shadow: 0 8px 32px rgba(56,189,248,0.2);
+        }
+
+        body.dark-mode .fact {
+            color: linen;
+        }
+
+        .fact {
+            font-size: 1.15rem;
+            color: #222;
+            margin-bottom: 32px;
+            min-height: 60px;
+        }
+
+        .continue-btn {
+            background: #38bdf8;
+            color: #fff;
+            border: none;
+            border-radius: 24px;
+            padding: 12px 36px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, opacity 0.4s;
+        }
+
+        .continue-btn:hover {
+            background: #0ea5e9;
+        }
+
+        .fade-out {
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.7s cubic-bezier(.4,2,.6,1);
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle theme">
+        <span id="themeIcon">🌙</span>
+    </button>
+    <div class="logo-container">
+        <div class="batchbinder-logo">BatchBinder</div>
+        <div class="logo-tagline">Your Everyday Backpack!</div>
+    </div>
+    <div class="particles-bg" id="particles-bg"></div>
+    <div class="center-box" id="centerBox">
+        <div class="fun-fact-badge">
+            <span style="margin-right: 4px;">💡</span> Fun Fact
+        </div>
+        <div class="fact" id="fact">Loading a fun fact...</div>
+        <button class="continue-btn" id="continueBtn">Let's Go!</button>
+    </div>
+    <script>
+        // Fun facts array
+        const funFacts = [
+            "Did you know? The human brain processes visual information 60,000 times faster than text.",
+            "Reading for just 6 minutes can reduce stress levels by up to 68%.",
+            "The average college student spends 24 hours per week studying.",
+            "Taking notes by hand improves memory and learning.",
+            "The Pomodoro Technique was invented by Francesco Cirillo in the late 1980s.",
+            "The human attention span is typically between 10-40 minutes.",
+            "Regular study breaks improve learning efficiency by 50%.",
+            "Mind mapping can improve memory retention by up to 32%."
+        ];
+
+        // Particle effect
+        const lightColors = ['#38bdf8', '#0ea5e9', '#fbbf24', '#f472b6', '#fff'];
+        const darkColors = ['#38bdf8', '#0ea5e9', '#10b981', '#f472b6', '#facc15'];
+        let currentColors = lightColors;
+
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        function setTheme(dark) {
+            document.body.classList.toggle('dark-mode', dark);
+            themeToggle.classList.toggle('dark', dark);
+            themeIcon.textContent = dark ? '☀️' : '🌙';
+            currentColors = dark ? darkColors : lightColors;
+            createParticles();
+        }
+
+        // Random fun fact display
+        function displayRandomFact() {
+            const factElement = document.getElementById('fact');
+            const randomFact = funFacts[Math.floor(Math.random() * funFacts.length)];
+            factElement.textContent = randomFact;
+        }
+
+        // Particle creation
+        function createParticles() {
+            const particlesBg = document.getElementById('particles-bg');
+            particlesBg.innerHTML = '';
+            const w = window.innerWidth;
+            for (let i = 0; i < 32; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                const size = Math.random() * 12 + 6;
+                p.style.width = p.style.height = size + 'px';
+                p.style.left = Math.random() * w + 'px';
+                p.style.background = currentColors[Math.floor(Math.random() * currentColors.length)];
+                p.style.boxShadow = `0 0 ${size * 2}px ${size/2}px ${p.style.background}`;
+                p.style.animationDelay = Math.random() * 4 + 's';
+                document.getElementById('particles-bg').appendChild(p);
+            }
+        }
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', () => {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            setTheme(prefersDark);
+            displayRandomFact();
+            createParticles();
+        });
+
+        themeToggle.onclick = () => setTheme(!document.body.classList.contains('dark-mode'));
+        window.addEventListener('resize', createParticles);
+
+        document.getElementById('continueBtn').onclick = function() {
+            const elements = [
+                document.getElementById('centerBox'),
+                document.getElementById('particles-bg'),
+                document.querySelector('.logo-container')
+            ];
+            elements.forEach(el => el.classList.add('fade-out'));
+            setTimeout(() => {
+                window.location.href = 'index2.html';
+            }, 700);
+        };
+    </script>
+</body>
+</html>

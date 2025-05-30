@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BatchBinder-Notes</title>
+    <link href="https://fonts.googleapis.com/css?family=Raleway:400,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:400,600&display=swap" rel="stylesheet">
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Raleway', 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            font-family: 'Raleway', 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body.dark-mode {
+            background-color: #111 !important;
+            color: linen !important;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background: #fff;
+            color: #222;
+            padding: 40px 0 24px 0;
+            text-align: left;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+
+        header .header-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header h1 {
+            display: none;
+        }
+
+        .dept-dropdown-container {
+            display: flex;
+            justify-content: center;
+            margin: 18px auto 24px;
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+        }
+        .dept-dropdown {
+            appearance: none;
+            background: #f8fafc;
+            color: #222;
+            border: none; /* Remove border */
+            border-radius: 8px;
+            padding: 12px 38px 12px 16px; /* Increased padding */
+            font-size: 1.2rem; /* Bigger font size */
+            font-family: inherit;
+            box-shadow: 0 2px 8px rgba(56,189,248,0.07);
+            outline: none;
+            width: 100%;
+            transition: box-shadow 0.2s;
+            cursor: pointer;
+            margin-left: 0;
+            margin-bottom: 0;
+            vertical-align: middle;
+        }
+        .dept-dropdown:focus, .dept-dropdown:hover {
+            box-shadow: 0 2px 12px rgba(56,189,248,0.13);
+            background: #e0f2fe;
+        }
+        .dept-dropdown-container::after {
+            content: "";
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            width: 0;
+            height: 0;
+            pointer-events: none;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 7px solid #38bdf8;
+            transform: translateY(-50%);
+        }
+        @media (max-width: 600px) {
+            header .header-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .dept-dropdown {
+                min-width: 140px;
+                font-size: 0.95rem;
+            }
+        }
+
+        .semester-inline {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+            justify-content: center; /* Center the semester pills */
+        }
+
+        .semester-pill {
+            background-color: transparent; /* Make background transparent */
+            border: none;
+            padding: 8px 15px;
+            border-radius: 0; /* Remove border radius */
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem; /* Medium font size */
+            font-weight: 500;
+            color: #808080; /* Grey color */
+            position: relative; /* For underline effect */
+        }
+
+        .semester-pill:hover, .semester-pill.active {
+            color: black; /* Black color on hover and active */
+        }
+
+        .semester-pill::before {
+            content: "";
+            position: absolute;
+            bottom: 3px; /* Adjust position of underline */
+            left: 0;
+            width: 100%;
+            height: 1px; /* Underline thickness */
+            background-color: #808080; /* Grey underline */
+            transform: scaleX(0); /* Hide underline initially */
+            transform-origin: bottom right;
+            transition: transform 0.3s ease; /* Add transition for smooth effect */
+        }
+
+        .semester-pill:hover::before,
+        .semester-pill.active::before {
+            transform: scaleX(1); /* Show underline on hover and active */
+            transform-origin: bottom left;
+        }
+
+        /* Nav Bar Styles (match index.html) */
+        nav.navbar {
+            width: 100%;
+            background: #fff;
+            color: #111;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            height: 64px;
+            position: relative;
+            z-index: 10;
+            border-bottom: 1px solid #e5e7eb;
+            box-shadow: none;
+        }
+        .navbar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0;
+            height: 64px;
+        }
+        .navbar-logo {
+            font-size: 1.7rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: #111;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: transform 0.25s cubic-bezier(.4,2,.6,1), box-shadow 0.25s;
+        }
+        .navbar-logo:hover {
+            color: #38bdf8;
+            transform: scale(1.08) rotate(-2deg);
+            text-shadow: 0 4px 18px rgba(56,189,248,0.18);
+            box-shadow: 0 2px 16px rgba(56,189,248,0.10);
+        }
+        .navbar-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+        .navbar-links a {
+            color: #111;
+            text-decoration: none;
+            font-size: 0.89rem;
+            font-weight: 500;
+            transition: color 0.2s;
+            padding: 2px 8px;
+            font-family: 'Poppins', 'Raleway', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+        }
+        .navbar-links a:hover {
+            color: #38bdf8;
+        }
+        .navbar-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: currentColor;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        .navbar-links a:hover::after {
+            transform: scaleX(1);
+        }
+        .navbar-links a.active {
+            color: #38bdf8;
+        }
+        .navbar-links a:nth-child(1):hover,
+        .navbar-links a:nth-child(1).active {
+            color: #ef4444 !important; /* Red */
+        }
+        .navbar-links a:nth-child(2):hover,
+        .navbar-links a:nth-child(2).active {
+            color: #2563eb !important; /* Blue */
+        }
+        .navbar-links a:nth-child(3):hover,
+        .navbar-links a:nth-child(3).active {
+            color: #10b981 !important; /* Green */
+        }
+        .navbar-links a:nth-child(4):hover,
+        .navbar-links a:nth-child(4).active {
+            color: #facc15 !important; /* Yellow */
+        }
+        @media (max-width: 900px) {
+            nav.navbar, .navbar-container {
+                flex-direction: column;
+                align-items: flex-start;
+                height: auto;
+                padding: 12px 10px;
+            }
+            .navbar-links {
+                gap: 18px;
+            }
+        }
+
+        /* Navbar Actions */
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+        .navbar-search {
+            position: relative;
+        }
+        .navbar-search input[type="text"] {
+            padding: 7px 36px 7px 14px;
+            border-radius: 18px;
+            border: 1px solid #e0e0e0;
+            font-size: 1rem;
+            width: 160px;
+            outline: none;
+            background: #fff;
+            color: #111;
+        }
+        .navbar-search button {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #38bdf8;
+            color: #fff;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 36px;
+        }
+        .navbar-search button:hover {
+            background: #0ea5e9;
+        }
+        .navbar-btn {
+            background: #38bdf8;
+            color: #fff;
+            border: none;
+            border-radius: 18px;
+            padding: 7px 20px;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-left: 6px;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
+            text-decoration: none !important;
+            box-shadow: 0 2px 8px rgba(56,189,248,0.08);
+            outline: none;
+            display: inline-block;
+        }
+        .navbar-btn:hover {
+            background: #0ea5e9;
+            color: #fff;
+            transform: translateY(-2px) scale(1.04);
+            box-shadow: 0 4px 16px rgba(56,189,248,0.18);
+        }
+        /* Remove icon margin if any */
+        .navbar-btn .icon {
+            display: none;
+        }
+
+        /* Dark/Light Mode Styles */
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        body.dark-mode {
+            background-color: #111 !important;
+            color: linen !important;
+        }
+        body.dark-mode .container,
+        body.dark-mode header,
+        body.dark-mode .sidebar,
+        body.dark-mode .main-content,
+        body.dark-mode .resource-card {
+            background: #111 !important;
+            color: linen !important;
+        }
+        body.dark-mode .sidebar a,
+        body.dark-mode .sidebar h2,
+        body.dark-mode .resource-desc,
+        body.dark-mode .resource-meta,
+        body.dark-mode .main-content,
+        body.dark-mode .resource-card h3 {
+            color: linen !important;
+        }
+        body.dark-mode .navbar,
+        body.dark-mode nav.navbar {
+            background: #111 !important;
+            color: linen !important;
+            border-color: #222 !important;
+        }
+        body.dark-mode .navbar-logo,
+        body.dark-mode .navbar-links a {
+            color: linen !important;
+        }
+        body.dark-mode .navbar-links a.active {
+            color: #38bdf8 !important;
+        }
+        body.dark-mode .navbar-search input[type="text"] {
+            background: #18181b !important;
+            color: linen !important;
+            border-color: #222;
+        }
+        body.dark-mode .navbar-search button,
+        body.dark-mode .navbar-btn,
+        body.dark-mode .download-btn {
+            background: #38bdf8 !important;
+            color: #fff !important;
+        }
+        body.dark-mode .navbar-search button:hover,
+        body.dark-mode .navbar-btn:hover,
+        body.dark-mode .download-btn:hover {
+            background: #0ea5e9 !important;
+        }
+        body.dark-mode .dept-dropdown {
+            background: #18181b !important;
+            color: linen !important;
+            border-color: #38bdf8 !important;
+        }
+        body.dark-mode .dept-dropdown option {
+            background: #222 !important;
+            color: linen !important;
+        }
+
+        /* Improved Department Dropdown */
+        .dept-dropdown-container {
+            display: flex;
+            justify-content: center;
+            margin: 18px auto 24px;
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+        }
+        .dept-dropdown {
+            appearance: none;
+            background: #f8fafc;
+            color: #222;
+            border: none; /* Remove border */
+            border-radius: 8px;
+            padding: 12px 38px 12px 16px; /* Increased padding */
+            font-size: 1.2rem; /* Bigger font size */
+            font-family: inherit;
+            box-shadow: 0 2px 8px rgba(56,189,248,0.07);
+            outline: none;
+            width: 100%;
+            transition: box-shadow 0.2s;
+            cursor: pointer;
+            margin-left: 0;
+            margin-bottom: 0;
+            vertical-align: middle;
+        }
+        .dept-dropdown:focus, .dept-dropdown:hover {
+            box-shadow: 0 2px 12px rgba(56,189,248,0.13);
+            background: #e0f2fe;
+        }
+        .dept-dropdown-container::after {
+            content: "";
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            width: 0;
+            height: 0;
+            pointer-events: none;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 7px solid #38bdf8;
+            transform: translateY(-50%);
+        }
+        @media (max-width: 600px) {
+            header .header-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .dept-dropdown {
+                min-width: 140px;
+                font-size: 0.95rem;
+            }
+        }
+
+        /* Navigation */
+        .semester-nav {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+        }
+
+        .semester-nav h2 {
+            color: #4b6cb7;
+            margin-bottom: 15px;
+        }
+
+        .semesters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .semester-btn {
+            background-color: #e9ecef;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .semester-btn:hover, .semester-btn.active {
+            background-color: #4b6cb7;
+            color: white;
+        }
+
+        /* Main Content */
+        .content-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .sidebar {
+            flex: 1;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .sidebar h2 {
+            color: #4b6cb7;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            margin-bottom: 10px;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bookmark-btn {
+            color: #4b6cb7;
+            cursor: pointer;
+            font-size: 1.2rem;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+            margin-left: 10px;
+            padding: 4px;
+        }
+
+        .bookmark-btn:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .bookmark-btn.active {
+            opacity: 1;
+            color: #facc15;
+        }
+
+        body.dark-mode .bookmark-btn {
+            color: linen;
+        }
+
+        body.dark-mode .bookmark-btn.active {
+            color: #facc15;
+        }
+
+        .sidebar a {
+            color: #333;
+            text-decoration: none;
+            transition: color 0.3s;
+            display: block;
+            padding: 8px 0;
+        }
+
+        .sidebar a:hover {
+            color: #4b6cb7;
+        }
+
+        .sidebar a.active {
+            color: #4b6cb7;
+            font-weight: bold;
+        }
+
+        .main-content {
+            flex: 3;
+        }
+
+        .resource-card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .resource-card h3 {
+            color: #4b6cb7;
+            margin-bottom: 10px;
+        }
+
+        .resource-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .resource-desc {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .download-btn {
+            display: inline-block;
+            background-color: #4b6cb7;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+            margin-top: 15px;
+            transition: background-color 0.3s;
+        }
+
+        .download-btn:hover {
+            background-color: #3a5a9f;
+        }
+
+        /* Dark/Light Mode Styles - Semester Pills */
+        body.dark-mode .semester-pill {
+            color: linen; /* Linen color in dark mode */
+        }
+        body.dark-mode .semester-pill::before {
+            background-color: linen; /* Linen underline in dark mode */
+        }
+
+        /* Toggle Switch Styles (From index.html) */
+        .theme-toggle-btn {
+            background: #e5e7eb;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            width: 62px;
+            height: 32px;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            padding: 4px;
+            margin-top: 10px; /* Increased margin-top */
+            margin-bottom: 10px; /* Added margin-bottom */
+        }
+        #themeIcon {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transform: translateX(0);
+            transition: transform 0.3s ease, background-color 0.3s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .theme-toggle-btn.dark {
+            background: #1e293b;
+        }
+
+        .theme-toggle-btn.dark #themeIcon {
+            transform: translateX(30px);
+            background: #0ea5e9;
+        }
+
+        .sun-icon, .moon-icon {
+            position: absolute;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .sun-icon { right: 6px; }
+        .moon-icon { left: 6px; }
+
+        /* Coming Soon Badge Styles */
+        .sidebar .coming-soon {
+            position: relative;
+            opacity: 0.85;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding-right: 85px; /* Make space for badge */
+        }
+
+        .coming-soon-badge {
+            position: absolute;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            background: linear-gradient(90deg, #d4af37 60%, #fffbe6 100%);
+            color: #222;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(212,175,55,0.13);
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .content-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Nav Bar Start -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="#" class="navbar-logo">BatchBinder</a>
+            <div class="navbar-links">
+                <a href="index2.html">Home</a>
+                <a href="notes.html" class="active">Notes</a>
+                <a href="bookshelf.html">BookShelf</a>
+                <a href="#" onclick="showComingSoonMessage('Collaborative Community'); return false;">Community</a>
+            </div>
+            <div class="navbar-actions">
+                <form class="navbar-search" onsubmit="return false;">
+                    <input type="text" placeholder="Search...">
+                    <button type="submit">&#128269;</button>
+                </form>
+                <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle theme">
+                    <span id="themeIcon">🌙</span>
+                </button>
+                <a href="#" class="navbar-btn">Sign Up</a>
+                <a href="#" class="navbar-btn">Login</a>
+            </div>
+        </div>
+    </nav>
+    <!-- Nav Bar End -->
+
+    <header>
+        <div class="header-row">
+            <!-- <h1>Computer Science and Engineering</h1> -->
+            <div class="dept-dropdown-container">
+                <select class="dept-dropdown" id="deptDropdown">
+                    <option value="csc">Computer Science and Engineering</option>
+                    <option value="it">Information Technology</option>
+                    <option value="comm">Electronics and Communication Engineering</option>
+                    <option value="electrical">Electrical and Electronics Engineering</option>
+                    <option value="mech">Mechanical Engineering</option>
+                    <option value="civil">Civil Engineering</option>
+                    <option value="mechatronics">Mechatronics Engineering</option>
+                    <option value="instrumentation">Electronics and Instrumentation Engineering</option>
+                </select>
+            </div>
+        </div>
+        <div class="semester-inline" id="semesterInline">
+            <button class="semester-pill active">Semester 1</button>
+            <button class="semester-pill">Semester 2</button>
+            <button class="semester-pill">Semester 3</button>
+            <button class="semester-pill">Semester 4</button>
+            <button class="semester-pill">Semester 5</button>
+            <button class="semester-pill">Semester 6</button>
+            <button class="semester-pill">Semester 7</button>
+            <button class="semester-pill">Semester 8</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="content-container">
+            <div class="sidebar">
+                <div class="subjects">
+                    <h2>Subjects</h2>
+                    <ul>
+                        <li>
+                            <a href="#" class="active">Data Structures</a>
+                            <span class="bookmark-btn" onclick="toggleBookmark(this, 'Data Structures')">🔖</span>
+                        </li>
+                        <li>
+                            <a href="#">Algorithms</a>
+                            <span class="bookmark-btn" onclick="toggleBookmark(this, 'Algorithms')">🔖</span>
+                        </li>
+                        <li>
+                            <a href="#">Operating Systems</a>
+                            <span class="bookmark-btn" onclick="toggleBookmark(this, 'Operating Systems')">🔖</span>
+                        </li>
+                        <li>
+                            <a href="#">Computer Networks</a>
+                            <span class="bookmark-btn" onclick="toggleBookmark(this, 'Computer Networks')">🔖</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="resources">
+                    <h2>Resources</h2>
+                    <ul>
+                        <li><a href="#" class="active">Notes</a></li>
+                        <li class="coming-soon">
+                            <span class="coming-soon-badge">Coming Soon</span>
+                            <a href="#" onclick="showResourceMessage('Assignments'); return false;">Assignments</a>
+                        </li>
+                        <li class="coming-soon">
+                            <span class="coming-soon-badge">Coming Soon</span>
+                            <a href="#" onclick="showResourceMessage('Tests'); return false;">Tests</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <div class="resource-card">
+                    <h3>Data Structures</h3>
+                    <div class="resource-meta">
+                        <span>Lecture Notes - Module 1</span>
+                        <span>Professor Dr. Zaynor | ID pages</span>
+                    </div>
+                    <p class="resource-desc">Introduction to data structures, arrays, and linked lists. Covers basic operations and complexity analysis.</p>
+                    <a href="#" class="download-btn">Download</a>
+                </div>
+
+                <div class="resource-card">
+                    <h3>Data Structures</h3>
+                    <div class="resource-meta">
+                        <span>Assignment 2 - Linked Lists</span>
+                        <span>Professor Dr. Safigemenov | Lab Data 2024-05-15</span>
+                    </div>
+                    <p class="resource-desc">Implementation of singly and doubly linked lists with various operations.</p>
+                    <a href="#" class="download-btn">Download</a>
+                </div>
+
+                <div class="resource-card">
+                    <h3>Algorithms</h3>
+                    <div class="resource-meta">
+                        <span>Midterm Exam - Solutions</span>
+                        <span>Professor Dr. Abhile | Exam Data 2024-04-20</span>
+                    </div>
+                    <p class="resource-desc">Solutions to midterm exam covering sorting algorithms and complexity analysis.</p>
+                    <a href="#" class="download-btn">Download</a>
+                </div>
+
+                <div class="resource-card">
+                    <h3>Operating Systems</h3>
+                    <div class="resource-meta">
+                        <span>Lecture Notes - Process Management</span>
+                        <span>Professor Dr. Ikerensen | ID pages</span>
+                    </div>
+                    <p class="resource-desc">Process scheduling, synchronization, and deadlocks in operating systems.</p>
+                    <a href="#" class="download-btn">Download</a>
+                </div>
+
+                <div class="resource-card">
+                    <h3>Computer Networks</h3>
+                    <div class="resource-meta">
+                        <span>Assignment 1 - TCP/IP</span>
+                        <span>Professor Dr. KVnekamadan | Lab Data 2024-05-10</span>
+                    </div>
+                    <p class="resource-desc">Implementation of basic TCP/IP protocols and socket programming.</p>
+                    <a href="#" class="download-btn">Download</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Semester Navigation
+        const semesterBtns = document.querySelectorAll('.semester-btn');
+        semesterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                semesterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                // Here you would typically load content for the selected semester
+                console.log(`Loading content for ${btn.textContent}`);
+            });
+        });
+
+        // Subject Navigation
+        const subjectLinks = document.querySelectorAll('.subjects a');
+        subjectLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                subjectLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                // Here you would filter resources by subject
+                console.log(`Showing resources for ${link.textContent}`);
+            });
+        });
+
+        // Resource Type Navigation
+        const resourceLinks = document.querySelectorAll('.resources a');
+        resourceLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                resourceLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                // Here you would filter resources by type
+                console.log(`Showing ${link.textContent} resources`);
+            });
+        });
+
+        // Download Button Functionality
+        const downloadBtns = document.querySelectorAll('.download-btn');
+        downloadBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const resourceTitle = btn.parentElement.querySelector('h3').textContent;
+                const resourceName = btn.parentElement.querySelector('.resource-meta span:first-child').textContent;
+                console.log(`Downloading ${resourceName} for ${resourceTitle}`);
+                // In a real implementation, this would trigger a file download
+                alert(`Downloading ${resourceName} for ${resourceTitle}`);
+            });
+        });
+
+        // Coming Soon alert for Community
+        function showComingSoonMessage(feature) {
+            const messages = [
+                `🚧 Oops! ${feature} is still cooking in our development kitchen! 👨‍🍳`,
+                `✨ Hold tight! ${feature} is getting dressed up for its big debut! 🎭`,
+                `🎯 Almost there! ${feature} is doing final rehearsals! 🎬`,
+                `🔮 ${feature} is learning some cool tricks before meeting you! 🎩`,
+                `🚀 ${feature} is in its final countdown to launch! 🌟`
+            ];
+            alert(messages[Math.floor(Math.random() * messages.length)]);
+        }
+
+        // Toggle Switch for Light/Dark Mode
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        function setTheme(dark) {
+            if (dark) {
+                document.body.classList.add('dark-mode');
+                themeToggle.classList.add('dark');
+                themeIcon.textContent = '☀️';
+            } else {
+                document.body.classList.remove('dark-mode');
+                themeToggle.classList.remove('dark');
+                themeIcon.textContent = '🌙';
+            }
+        }
+        setTheme(prefersDark);
+        themeToggle.onclick = function() {
+            themeIcon.classList.add('theme-animate');
+            setTimeout(() => themeIcon.classList.remove('theme-animate'), 500);
+            const isDark = document.body.classList.toggle('dark-mode');
+            setTheme(isDark);
+        };
+
+        // Department Dropdown Change (update header text)
+        document.getElementById('deptDropdown').addEventListener('change', function() {
+            const selected = this.options[this.selectedIndex].text;
+            document.querySelector('header h1').textContent = selected;
+        });
+
+        // Inline Semester Pills Navigation
+        const semesterPills = document.querySelectorAll('.semester-pill');
+        semesterPills.forEach(btn => {
+            btn.addEventListener('click', () => {
+                semesterPills.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                // Here you would typically load content for the selected semester
+                console.log(`Loading content for ${btn.textContent}`);
+            });
+        });
+
+        // Resource Coming Soon Messages
+        function showResourceMessage(feature) {
+            const messages = [
+                `📚 ${feature} module is getting ready for your learning journey!`,
+                `🎯 ${feature} section is in final stages of development!`,
+                `✨ ${feature} feature will be here before you know it!`,
+                `🚀 ${feature} is launching soon with amazing content!`,
+                `🌟 ${feature} module is being polished to perfection!`
+            ];
+            alert(messages[Math.floor(Math.random() * messages.length)]);
+        }
+
+        // Bookmark functionality
+        function toggleBookmark(element, subject) {
+            element.classList.toggle('active');
+            
+            // Get existing bookmarks from localStorage
+            let bookmarks = JSON.parse(localStorage.getItem('bookmarkedSubjects')) || [];
+            
+            if (element.classList.contains('active')) {
+                // Add to bookmarks if not already present
+                if (!bookmarks.includes(subject)) {
+                    bookmarks.push(subject);
+                    showToast(`${subject} added to Bookshelf!`);
+                }
+            } else {
+                // Remove from bookmarks
+                bookmarks = bookmarks.filter(b => b !== subject);
+                showToast(`${subject} removed from Bookshelf!`);
+            }
+            
+            // Save updated bookmarks
+            localStorage.setItem('bookmarkedSubjects', JSON.stringify(bookmarks));
+        }
+
+        function showToast(message) {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.style.position = 'fixed';
+            toast.style.bottom = '20px';
+            toast.style.right = '20px';
+            toast.style.background = '#4b6cb7';
+            toast.style.color = 'white';
+            toast.style.padding = '12px 24px';
+            toast.style.borderRadius = '8px';
+            toast.style.zIndex = '1000';
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.3s ease';
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            // Show and hide toast
+            setTimeout(() => toast.style.opacity = '1', 100);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Load bookmarks on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const bookmarks = JSON.parse(localStorage.getItem('bookmarkedSubjects')) || [];
+            document.querySelectorAll('.subjects li').forEach(li => {
+                const subject = li.querySelector('a').textContent;
+                if (bookmarks.includes(subject)) {
+                    li.querySelector('.bookmark-btn').classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
