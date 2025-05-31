@@ -61,6 +61,8 @@
             border-radius: 4px;
             transition: all 0.2s;
             font-size: 1.2rem;
+            background: #fff;
+            border: 1px solid #fee2e2;
         }
         .remove-bookmark:hover {
             background: #fee2e2;
@@ -79,6 +81,71 @@
             transition: opacity 0.3s;
             font-size: 1rem;
             box-shadow: 0 2px 8px rgba(56,189,248,0.13);
+        }
+        .bookshelf-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 28px;
+            margin-top: 30px;
+        }
+        .bookshelf-card {
+            background: linear-gradient(135deg, #e0f2fe 60%, #f0fdfa 100%);
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(56,189,248,0.09);
+            padding: 28px 24px 20px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            position: relative;
+            border: 2px solid #38bdf8;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+        .bookshelf-card:hover {
+            box-shadow: 0 8px 32px rgba(56,189,248,0.18);
+            transform: translateY(-4px) scale(1.03);
+        }
+        .bookshelf-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #2563eb;
+            margin-bottom: 8px;
+        }
+        .bookshelf-meta {
+            font-size: 0.98rem;
+            color: #475569;
+            margin-bottom: 10px;
+        }
+        .bookshelf-prof {
+            font-size: 0.93rem;
+            color: #0ea5e9;
+            margin-bottom: 6px;
+        }
+        .bookshelf-pages {
+            font-size: 0.93rem;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+        .bookshelf-actions {
+            margin-top: auto;
+            display: flex;
+            gap: 12px;
+        }
+        .open-btn {
+            background: #38bdf8;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .open-btn:hover {
+            background: #2563eb;
+            transform: scale(1.06);
         }
         /* ...dark mode styles from index.html... */
         body.dark-mode {
@@ -307,12 +374,107 @@
                 gap: 10px;
             }
         }
-        /* ...existing code... */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 10px;
+            }
+            .bookmarked-subject {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            .remove-bookmark {
+                padding: 10px;
+            }
+            .navbar-container {
+                flex-direction: column;
+                height: auto;
+                padding: 10px 0;
+            }
+            .navbar-logo {
+                margin-bottom: 10px;
+            }
+            .navbar-links {
+                flex-direction: column;
+                width: 100%;
+                gap: 15px;
+                margin: 10px 0;
+            }
+            .navbar-actions {
+                flex-direction: column;
+                width: 100%;
+                gap: 10px;
+            }
+            .navbar-search {
+                width: 100%;
+            }
+            .navbar-search input[type="text"] {
+                width: 100%;
+            }
+            .navbar-btn {
+                width: 100%;
+                text-align: center;
+            }
+            .toast {
+                left: 10px;
+                right: 10px;
+                bottom: 10px;
+                text-align: center;
+            }
+        }
+        /* Quick Jot Modal styles */
+        #jotModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.25);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        #jotModal > div {
+            background: #fff;
+            border-radius: 12px;
+            max-width: 400px;
+            width: 90%;
+            margin: auto;
+            padding: 28px 20px 20px 20px;
+            box-shadow: 0 8px 32px rgba(56, 189, 248, 0.18);
+            position: relative;
+        }
+        #jotModal h2 {
+            color: #38bdf8;
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+        }
+        #jotModal textarea {
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid #38bdf8;
+            padding: 10px;
+            font-size: 1rem;
+            margin-bottom: 16px;
+        }
+        #jotModal button {
+            background: #38bdf8;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        #jotModal button:hover {
+            background: #2563eb;
+        }
     </style>
 </head>
 <body>
     <nav class="navbar">
-        <a href="#" class="navbar-logo">BatchBinder</a>
+        <a href="index2.html" class="navbar-logo">BatchBinder</a>
         <div class="navbar-links">
             <a href="index2.html">Home</a>
             <a href="notes.html">Notes</a>
@@ -333,8 +495,21 @@
     </nav>
     <div class="container">
         <h1>My Bookshelf</h1>
-        <div id="bookmarked-subjects">
+        <div id="bookshelf-grid" class="bookshelf-grid">
             <!-- Bookmarked subjects will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Quick Jot Modal -->
+    <div id="jotModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.25); z-index:2000; align-items:center; justify-content:center;">
+        <div style="background:#fff; border-radius:12px; max-width:400px; width:90%; margin:auto; padding:28px 20px 20px 20px; box-shadow:0 8px 32px rgba(56,189,248,0.18); position:relative;">
+            <h2 style="color:#38bdf8; font-size:1.3rem; margin-bottom:12px;">Quick Jot for <span id="jotSubject" style="color:#2563eb;"></span></h2>
+            <textarea id="jotInput" rows="5" style="width:100%; border-radius:8px; border:1px solid #38bdf8; padding:10px; font-size:1rem; margin-bottom:16px;" placeholder="Type your formula or statement here..."></textarea>
+            <div style="display:flex; gap:10px;">
+                <button id="saveJotBtn" style="background:#38bdf8; color:#fff; border:none; border-radius:8px; padding:8px 18px; font-weight:600; cursor:pointer;">Save</button>
+                <button onclick="closeJotModal()" style="background:#64748b; color:#fff; border:none; border-radius:8px; padding:8px 18px; font-weight:600; cursor:pointer;">Cancel</button>
+            </div>
+            <span id="jotEditIndex" style="display:none;"></span>
         </div>
     </div>
     <script>
@@ -371,19 +546,115 @@
             setTheme(isDark);
         };
 
+        // Demo: Simulate extra info for bookmarks (in real app, fetch from notes)
+        function getSubjectDetails(subject) {
+            // Try to find from batchBinderNotes (admin panel notes)
+            const notes = JSON.parse(localStorage.getItem('batchBinderNotes')) || [];
+            // Find the latest note for this subject
+            const note = notes.reverse().find(n => n.subject === subject);
+            if (note) {
+                return {
+                    professor: note.professor || "Unknown",
+                    pages: note.pages || "N/A",
+                    pdfUrl: note.pdfUrl || "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+                };
+            }
+            // Fallback demo data
+            return {
+                professor: "Unknown",
+                pages: "N/A",
+                pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+            };
+        }
+
+        // Quick Jot logic
+        let currentJotSubject = null;
+        let editingJotIndex = null;
+
+        function openJotModal(subject, editIndex = null, editText = "") {
+            currentJotSubject = subject;
+            editingJotIndex = editIndex;
+            document.getElementById('jotModal').style.display = 'flex';
+            document.getElementById('jotSubject').textContent = subject;
+            document.getElementById('jotInput').value = editText || "";
+            document.getElementById('jotEditIndex').textContent = editIndex !== null ? editIndex : "";
+        }
+        function closeJotModal() {
+            document.getElementById('jotModal').style.display = 'none';
+            document.getElementById('jotInput').value = "";
+            document.getElementById('jotEditIndex').textContent = "";
+            currentJotSubject = null;
+            editingJotIndex = null;
+        }
+        document.getElementById('saveJotBtn').onclick = function() {
+            const jotText = document.getElementById('jotInput').value.trim();
+            if (!jotText) return;
+            let allJots = JSON.parse(localStorage.getItem('bookshelfJots') || '{}');
+            let jots = allJots[currentJotSubject] || [];
+            const editIdx = document.getElementById('jotEditIndex').textContent;
+            if (editIdx !== "") {
+                jots[parseInt(editIdx, 10)] = jotText;
+            } else {
+                jots.push(jotText);
+            }
+            allJots[currentJotSubject] = jots;
+            localStorage.setItem('bookshelfJots', JSON.stringify(allJots));
+            closeJotModal();
+            loadBookmarks();
+        };
+
+        function deleteJot(subject, idx) {
+            let allJots = JSON.parse(localStorage.getItem('bookshelfJots') || '{}');
+            let jots = allJots[subject] || [];
+            jots.splice(idx, 1);
+            allJots[subject] = jots;
+            localStorage.setItem('bookshelfJots', JSON.stringify(allJots));
+            loadBookmarks();
+        }
+
+        function editJot(subject, idx) {
+            let allJots = JSON.parse(localStorage.getItem('bookshelfJots') || '{}');
+            let jots = allJots[subject] || [];
+            openJotModal(subject, idx, jots[idx]);
+        }
+
+        // Update loadBookmarks to show jots and add jot button
         function loadBookmarks() {
-            const container = document.getElementById('bookmarked-subjects');
+            const container = document.getElementById('bookshelf-grid');
             const bookmarks = JSON.parse(localStorage.getItem('bookmarkedSubjects')) || [];
+            const allJots = JSON.parse(localStorage.getItem('bookshelfJots') || '{}');
             if (bookmarks.length === 0) {
                 container.innerHTML = '<div class="bookshelf-empty">No bookmarked subjects yet!</div>';
                 return;
             }
-            container.innerHTML = bookmarks.map(subject => `
-                <div class="bookmarked-subject">
-                    <span>${subject}</span>
-                    <span class="remove-bookmark" onclick="removeBookmark('${subject}')">🗑️</span>
+            container.innerHTML = bookmarks.map(subject => {
+                const details = getSubjectDetails(subject);
+                const viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(details.pdfUrl)}&embedded=true`;
+                const jots = allJots[subject] || [];
+                return `
+                <div class="bookshelf-card">
+                    <div class="bookshelf-title">${subject}</div>
+                    <div class="bookshelf-prof">Professor: ${details.professor}</div>
+                    <div class="bookshelf-pages">Pages: ${details.pages}</div>
+                    <div class="bookshelf-actions" style="margin-bottom:10px;">
+                        <a class="open-btn" href="${viewerUrl}" target="_blank" rel="noopener">Open</a>
+                        <span class="remove-bookmark" onclick="removeBookmark('${subject}')">🗑️</span>
+                        <button class="open-btn" style="background:#0ea5e9;" onclick="openJotModal('${subject}')">Quick Jot</button>
+                    </div>
+                    <div class="bookshelf-meta" style="width:100%;">
+                        ${jots.length > 0 ? `<div style="margin-top:10px;"><b>Quick Jots:</b><ul style="margin:8px 0 0 0; padding-left:18px; color:#222;">${
+                            jots.map((j, idx) => `
+                                <li style="margin-bottom:6px;">
+                                    <span>${j}</span>
+                                    <button onclick="editJot('${subject}',${idx})" style="margin-left:8px; background:#facc15; color:#222; border:none; border-radius:4px; padding:2px 8px; font-size:0.9em; cursor:pointer;">Edit</button>
+                                    <button onclick="deleteJot('${subject}',${idx})" style="margin-left:4px; background:#ef4444; color:#fff; border:none; border-radius:4px; padding:2px 8px; font-size:0.9em; cursor:pointer;">Delete</button>
+                                </li>
+                            `).join('')
+                        }</ul></div>` : ''}
+                    </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
         }
         function removeBookmark(subject) {
             let bookmarks = JSON.parse(localStorage.getItem('bookmarkedSubjects')) || [];
